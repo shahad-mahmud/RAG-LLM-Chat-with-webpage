@@ -1,3 +1,3 @@
-# Aryabhata LLM
+# Chat with Web Page
 
-A math equation solver using LLMs.
+Chat with a web page using Retrival Augment Generation (RAG) and Large Language Models (LLM).

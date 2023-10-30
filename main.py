@@ -9,7 +9,7 @@ if __name__ == "__main__":
         "https://huggingface.co/docs/transformers/model_doc/bert",
     ]
 
-    llm = src.llms.get_llama2_chat()
+    llm = src.llms.get_llava_chat()
 
     texts = src.data.load_text(links, split=True)
 
@@ -36,3 +36,5 @@ if __name__ == "__main__":
         )
 
         print(result["answer"])
+        print("-" * 88)
+        print()

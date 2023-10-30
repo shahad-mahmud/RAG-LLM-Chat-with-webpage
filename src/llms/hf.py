@@ -3,6 +3,7 @@ import os
 import torch
 import transformers
 from langchain.llms.huggingface_pipeline import HuggingFacePipeline
+from llava.model.language_model.llava_llama import LlavaLlamaForCausalLM
 
 MODEL_IDS = {
     "llama2_chat": "meta-llama/Llama-2-7b-chat-hf",
@@ -51,6 +52,11 @@ def get_llama2_chat():
 
 
 def get_llava_chat():
+    class LlavaConfig(transformers.LlamaConfig):
+        model_type = "llava"
+
+    transformers.AutoConfig.register("llava", LlavaConfig)
+
     bnb_config = transformers.BitsAndBytesConfig(
         load_in_4bit=True,
         bnb_4bit_quant_type="nf4",
@@ -58,7 +64,7 @@ def get_llava_chat():
         bnb_4bit_compute_dtype=torch.bfloat16,
     )
 
-    model = transformers.AutoModelForCausalLM.from_pretrained(
+    model = LlavaLlamaForCausalLM.from_pretrained(
         MODEL_IDS["llava"],
         quantization_config=bnb_config if torch.cuda.is_available() else None,
         device_map="auto",

@@ -3,12 +3,14 @@ beautifulsoup4
 bitsandbytes
 black
 flake8
+git+https://github.com/haotian-liu/LLaVA
 isort
 langchain
 langchain
 pre-commit
-protobuf
+protobuf==3.19
 qdrant-client
 sentence-transformers
 torch==2.0
 transformers
+xformers
