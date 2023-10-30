@@ -1,0 +1,14 @@
+accelerate
+beautifulsoup4
+bitsandbytes
+black
+flake8
+isort
+langchain
+langchain
+pre-commit
+protobuf
+qdrant-client
+sentence-transformers
+torch==2.0
+transformers
