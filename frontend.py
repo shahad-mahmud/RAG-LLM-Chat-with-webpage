@@ -1,7 +1,9 @@
 import streamlit as st
-import src
+from langchain.chains import RetrievalQAWithSourcesChain
 from langchain.vectorstores import qdrant
-from langchain.chains import RetrievalQA
+from qdrant_client import QdrantClient
+
+import src
 
 
 def main():
@@ -9,6 +11,15 @@ def main():
 
     if "links" not in st.session_state:
         st.session_state["links"] = []
+
+    embedder = src.embeddings.get_hf_embedder()
+
+    client = QdrantClient()
+    vectorstore = qdrant.Qdrant(
+        client, collection_name="web_pages", embeddings=embedder
+    )
+
+    llm = src.llms.get_llama2_chat()
 
     with st.sidebar:
         option = st.selectbox("Which LLM do you want to use?", ("LLaMA 2", "LLaVA"))
@@ -19,8 +30,6 @@ def main():
             llm = src.llms.get_llava_chat()
         else:
             raise ValueError(f"Invalid option: {option}")
-
-        embedder = src.embeddings.get_hf_embedder()
 
         st.text_input(
             "web page links",
@@ -35,17 +44,23 @@ def main():
                 st.session_state.links.append(link)
                 text = src.data.load_text(link, split=True)
 
-                vectorstore = qdrant.Qdrant.from_documents(
-                    text, embedder, collection_name="chat_with_page"
-                )
+                # add the text to the vectorstore
+                vectorstore.add_documents(text)
 
         # show the added links
         for i, link in enumerate(st.session_state.links):
             if link:
                 st.write(f"{i+1}. {link}")
 
+    # chain = RetrievalQA.from_llm(llm=llm, retriver=vectorstore.as_retriever())
+    chain = RetrievalQAWithSourcesChain(llm=llm, retriver=vectorstore.as_retriever())
+
     if question := st.chat_input(placeholder="Ask your web page"):
         st.chat_message("user").write(question)
+
+        result = chain(question)
+
+        st.chat_message("bot").write(result["answer"])
 
 
 if __name__ == "__main__":

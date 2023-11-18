@@ -1,1 +1,1 @@
-from . import data, embeddings, llms  # noqa: F401
+from . import data, embeddings, llms, prompts  # noqa: F401
